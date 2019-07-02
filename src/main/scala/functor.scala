@@ -1,3 +1,6 @@
+import cats._
+import cats.implicits._
+
 object functor extends App {
 
   trait Printable[A] {
@@ -43,4 +46,7 @@ object functor extends App {
   }
 
   cat.print
+
+  implicit val catShow: Show[Cat] = Show.show(value => s"${value.name} is a ${value.color} cat.")
+  println(cat.show)
 }

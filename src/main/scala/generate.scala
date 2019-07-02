@@ -7,6 +7,8 @@ import play.api.libs.json._
 object generate extends App {
   val UNIXBASETIME = 1538172419000L
   val PAYLOADNUMBERS = 45000
+  val APIKEY = "5c070796b77c77002e984a2d"
+
   val r = new scala.util.Random
   val fileName = "webhookPayload.txt"
   val writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)))
@@ -29,7 +31,7 @@ object generate extends App {
     val placeDepartureJSValue = Json.parse(placeArrivalTemplate)
     val geofenceEnterJSValue = Json.parse(geofenceEnterTemplate)
     val geofenceDwellJSValue = Json.parse(geofenceDwellTemplate)
-    val geofenceExitJSvalue = Json.parse(geofenceExitTemplate)
+    val geofenceExitJSValue = Json.parse(geofenceExitTemplate)
     val geofenceVenueConfirmedJSvalue = Json.parse(geofenceVenueConfirmedTemplate)
     val geofencePresenceJSvalue = Json.parse(geofencePresenceTemplate)
 
@@ -81,28 +83,29 @@ object generate extends App {
         __.read[JsNumber].map(_ => Json.toJson(lng))
       )
 
+    def composeJsonPayload(result: JsValue) = "/foursquare|" + Json.stringify(result) + "|" + APIKEY + "\n"
 
     val placeArrivalResult = placeArrivalJSValue.transform(placeArrivalTransformer).asOpt.get
-    writer.write(Json.stringify(placeArrivalResult) + "\n")
+    writer.write(composeJsonPayload(placeArrivalResult))
 
     val placeDepartureResult = placeArrivalJSValue.transform(placeDepartureTransformer).asOpt.get
-    writer.write(Json.stringify(placeDepartureResult) + "\n")
+    writer.write(composeJsonPayload(placeDepartureResult))
 
     val geofenceEnterResult = geofenceEnterJSValue.transform(geofenceEnterTransformer).asOpt.get
-    writer.write(Json.stringify(geofenceEnterResult) + "\n")
+    writer.write(composeJsonPayload(geofenceEnterResult))
 
     val geofenceDwellResult = geofenceDwellJSValue.transform(geofenceDwellTransformer).asOpt.get
-    writer.write(Json.stringify(geofenceDwellResult) + "\n")
+    writer.write(composeJsonPayload(geofenceDwellResult))
 //    println(Json.stringify(result))
 
     val geofenceExitResult = geofenceExitJSValue.transform(geofenceDwellTransformer).asOpt.get
-    writer.write(Json.stringify(geofenceExitResult) + "\n")
+    writer.write(composeJsonPayload(geofenceExitResult))
 
     val geofenceVenueConfirmedResult = geofenceVenueConfirmedJSvalue.transform(geofenceDwellTransformer).asOpt.get
-    writer.write(Json.stringify(geofenceVenueConfirmedResult) + "\n")
+    writer.write(composeJsonPayload(geofenceVenueConfirmedResult))
 
     val geofencePresenceResult = geofencePresenceJSvalue.transform(geofenceDwellTransformer).asOpt.get
-    writer.write(Json.stringify(geofencePresenceResult) + "\n")
+    writer.write(composeJsonPayload(geofencePresenceResult))
   }
 
   writer.close()
